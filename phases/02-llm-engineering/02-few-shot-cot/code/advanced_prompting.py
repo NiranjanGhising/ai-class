@@ -2,7 +2,8 @@ import json
 import re
 import os
 from collections import Counter
-from openai import OpenAI
+from mistralai.client import Mistral
+
 
 
 GSM8K_EXAMPLES = [
@@ -158,7 +159,7 @@ def build_zero_shot_prompt(question):
 
 
 def call_llm(client, model, system, user, temperature=0.0):
-    response = client.chat.completions.create(
+    response = client.chat.complete(
         model=model,
         messages=[
             {"role": "system", "content": system},
@@ -507,8 +508,8 @@ TEST_QUESTIONS = [
 
 
 if __name__ == "__main__":
-    client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY", "your-api-key"))
-    model = "gpt-4o"
+    client = Mistral(api_key=os.environ.get("MISTRAL_API_KEY", "your-api-key"))
+    model = "mistral-small-latest"
 
     print("=" * 60)
     print("ADVANCED PROMPTING PIPELINE")
@@ -524,9 +525,7 @@ if __name__ == "__main__":
     print("\n\n--- Escalation Pipeline ---")
     for test in TEST_QUESTIONS[:2]:
         print(f"\nQ: {test['question'][:80]}...")
-        result = solve_with_escalation(
-            test["question"], GSM8K_EXAMPLES, client, model
-        )
+        result = solve_with_escalation(test["question"], GSM8K_EXAMPLES, client, model)
         print(f"  Method: {result['method']}")
         print(f"  Answer: {result['answer']} (expected: {test['answer']})")
         print(f"  Confidence: {result['confidence']}")
